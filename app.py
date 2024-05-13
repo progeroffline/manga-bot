@@ -1,6 +1,6 @@
 import random
 import asyncio
-
+import random
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -18,7 +18,9 @@ ADMIN_ID = env.int("ADMIN_ID")
 
 bot = Bot(
     token=TELEGRAM_BOT_TOKEN,
-    default=DefaultBotProperties(parse_mode=ParseMode.HTML),
+    default=DefaultBotProperties(
+        parse_mode=ParseMode.HTML,
+    ),
 )
 
 manga_api = SenkuroApi()
@@ -26,23 +28,22 @@ dp = Dispatcher()
 
 
 @dp.message(Command("getmanga"))
-async def command_get_manga_handler(message: Message) -> None:
+async def command_getmanga_handler(message: Message) -> None:
     mangas_main_page = manga_api.get_main_page()
     manga = random.choice(mangas_main_page["data"]["lastMangaChapters"]["edges"])
     manga = manga["node"]
 
     title = None
+
     for diff_title in manga["titles"]:
         if diff_title["lang"] == "RU":
             title = diff_title["content"]
-
     picture_url = manga["cover"]["original"]["url"]
     page_url = f"https://senkuro.com/manga/{manga['slug']}/chapters"
 
-    image_response = requests.get(picture_url, stream=True)
-    await message.answer_photo()
-
-    # await message.answer(f"```python\n {manga}\n```")
+    await message.answer_photo(
+        photo=picture_url, caption=f"👉 <a href='{page_url}'>{title}</a>"
+    )
 
 
 @dp.message(CommandStart())
@@ -56,7 +57,7 @@ async def command_start_handler(message: Message) -> None:
         return None
 
     await message.answer(
-        f"Hello, @{message.from_user.username} {message.from_user.full_name}!"
+        text=f"Hello, @{message.from_user.username} {message.from_user.full_name}!"
     )
 
     if message.from_user.id == ADMIN_ID:
