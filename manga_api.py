@@ -38,7 +38,3 @@ class SenkuroApi:
         }
 
         return self.session.post(self.api_link, json=json_data).json()
-
-
-manga_api = SenkuroApi()
-print(manga_api.get_main_page())
