@@ -1,6 +1,6 @@
 import random
 import asyncio
-import random
+
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -28,7 +28,7 @@ dp = Dispatcher()
 
 
 @dp.message(Command("getmanga"))
-async def command_getmanga_handler(message: Message) -> None:
+async def command_get_manga_handler(message: Message) -> None:
     mangas_main_page = manga_api.get_main_page()
     manga = random.choice(mangas_main_page["data"]["lastMangaChapters"]["edges"])
     manga = manga["node"]

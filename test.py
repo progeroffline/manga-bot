@@ -15,4 +15,4 @@ json_response = response.json()["result"]
 name = json_response["first_name"]
 username = json_response["username"]
 
-print()
+print(f"{name}: @{username}")
