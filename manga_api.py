@@ -43,4 +43,5 @@ class SenkuroApi:
 
 
 manga_api = SenkuroApi()
+
 print(manga_api.get_main_page())
