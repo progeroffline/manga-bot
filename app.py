@@ -1,5 +1,6 @@
 import asyncio
-from aiogram import Bot, Dispatcher, html
+
+from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
@@ -10,11 +11,14 @@ from environs import Env
 env = Env()
 env.read_env()
 
+# Bot token can be obtained via https://t.me/BotFather
 TELEGRAM_BOT_TOKEN = env.str("TELEGRAM_BOT_TOKEN")
 ADMIN_ID = env.int("ADMIN_ID")
+
 # Initialize Bot instance with default bot properties which will be passed to all API calls
-bot = Bot(token=TELEGRAM_BOT_TOKEN,
-          default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+bot = Bot(
+    token=TELEGRAM_BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+)
 
 # All handlers should be attached to the Router (or Dispatcher)
 dp = Dispatcher()
@@ -25,10 +29,14 @@ async def command_start_handler(message: Message) -> None:
     """
     This handler receives messages with `/start` command
     """
-
     print(message)
 
-    await message.answer(f"Hello, @{message.from_user.username} {message.from_user.full_name}!")
+    if message.from_user is None:
+        return None
+
+    await message.answer(
+        f"Hello, @{message.from_user.username} {message.from_user.full_name}!"
+    )
 
     if message.from_user.id == ADMIN_ID:
         return None
