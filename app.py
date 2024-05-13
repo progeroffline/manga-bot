@@ -1,13 +1,13 @@
 import asyncio
-
+import random
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 
 from environs import Env
-
+from manga_api import SenkuroApi
 env = Env()
 env.read_env()
 
@@ -17,11 +17,30 @@ ADMIN_ID = env.int("ADMIN_ID")
 
 # Initialize Bot instance with default bot properties which will be passed to all API calls
 bot = Bot(
-    token=TELEGRAM_BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+    token=TELEGRAM_BOT_TOKEN, default=DefaultBotProperties(
+        parse_mode=ParseMode.HTML)
 )
+manga_api = SenkuroApi()
 
-# All handlers should be attached to the Router (or Dispatcher)
 dp = Dispatcher()
+
+
+@dp.message(Command("getmanga"))
+async def command_getmanga_handler(message: Message) -> None:
+    mangas_main_page = manga_api.get_main_page()
+    manga = random.choice(
+        mangas_main_page["data"]["lastMangaChapters"]["edges"])
+    manga = manga["node"]
+
+    title = None
+
+    for diff_title in manga["titles"]:
+        if diff_title["lang"] == 'RU':
+            title = diff_title["content"]
+    picture_url = manga["cover"]["original"]["url"]
+    page_url = f"https://senkuro.com/manga/{manga['slug']}/chapters"
+
+    await message.answer_photo(photo=picture_url, caption=f"👉 <a href='{page_url}'>{title}</a>")
 
 
 @dp.message(CommandStart())
@@ -35,7 +54,7 @@ async def command_start_handler(message: Message) -> None:
         return None
 
     await message.answer(
-        f"Hello, @{message.from_user.username} {message.from_user.full_name}!"
+        text=f"Hello, @{message.from_user.username} {message.from_user.full_name}!"
     )
 
     if message.from_user.id == ADMIN_ID:
