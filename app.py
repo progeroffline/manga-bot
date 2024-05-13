@@ -1,18 +1,24 @@
 import asyncio
-from environs import Env
 
-from aiogram import Bot, Dispatcher, html
+from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
-# Bot token can be obtained via https://t.me/BotFather
+from environs import Env
+
 env = Env()
 env.read_env()
 
+# Bot token can be obtained via https://t.me/BotFather
 TELEGRAM_BOT_TOKEN = env.str("TELEGRAM_BOT_TOKEN")
+ADMIN_ID = env.int("ADMIN_ID")
 
+# Initialize Bot instance with default bot properties which will be passed to all API calls
+bot = Bot(
+    token=TELEGRAM_BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+)
 
 # All handlers should be attached to the Router (or Dispatcher)
 dp = Dispatcher()
@@ -23,12 +29,21 @@ async def command_start_handler(message: Message) -> None:
     """
     This handler receives messages with `/start` command
     """
-    # Most event objects have aliases for API methods that can be called in events' context
-    # For example if you want to answer to incoming message you can use `message.answer(...)` alias
-    # and the target chat will be passed to :ref:`aiogram.methods.send_message.SendMessage`
-    # method automatically or call API method directly via
-    # Bot instance: `bot.send_message(chat_id=message.chat.id, ...)`
-    await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!")
+    print(message)
+
+    if message.from_user is None:
+        return None
+
+    await message.answer(
+        f"Hello, @{message.from_user.username} {message.from_user.full_name}!"
+    )
+
+    if message.from_user.id == ADMIN_ID:
+        return None
+    if message.from_user.username == None:
+        await bot.send_message(chat_id=ADMIN_ID, text=f"{message.from_user.id}")
+    else:
+        await bot.send_message(chat_id=ADMIN_ID, text=f"@{message.from_user.username}")
 
 
 @dp.message()
@@ -47,11 +62,6 @@ async def echo_handler(message: Message) -> None:
 
 
 async def main() -> None:
-    # Initialize Bot instance with default bot properties which will be passed to all API calls
-    bot = Bot(
-        token=TELEGRAM_BOT_TOKEN,
-        default=DefaultBotProperties(parse_mode=ParseMode.HTML),
-    )
     # And the run events dispatching
     await dp.start_polling(bot)
 
