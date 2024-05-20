@@ -1,4 +1,29 @@
+from typing import Any, Dict, List, Optional, Union
 import requests
+from dataclasses import dataclass
+
+
+@dataclass()
+class Manga:
+    id: str
+    slug: str
+    status: str
+    type: str
+    raiting: str
+
+    title_ru: str
+    title_en: Optional[str]
+    title_ja: Optional[str]
+
+    picture_url: str
+    page_url: str
+
+
+@dataclass()
+class MainPageResponse:
+    mangas: List[Manga]
+    last_manga_chapters: List[Manga]
+    manga_popular_by_period: List[Manga]
 
 
 class SenkuroApi:
@@ -19,7 +44,7 @@ class SenkuroApi:
             "Connection": "keep-alive",
         }
 
-    def get_main_page(self):
+    def get_main_page(self) -> Union[MainPageResponse, None]:
         json_data = {
             "extensions": {
                 "persistedQuery": {
@@ -36,8 +61,42 @@ class SenkuroApi:
                 },
             },
         }
+        
+        def reformat_json_to_manga_object(json_data: Dict[str, Any]) -> Manga:
+            titles = {title["lang"]: title["content"] for title in json_data["titles"]}
+            return Manga(
+                id=json_data["id"],
+                slug=json_data["slug"],
+                status=json_data["status"],
+                type=json_data["type"],
+                raiting=json_data["rating"],
+                title_ru=titles["RU"],
+                title_en=titles.get("EN"),
+                title_ja=titles.get("JA"),
+                picture_url=json_data["cover"]["original"]["url"],
+                page_url=f"https://senkuro.com/manga/{json_data['slug']}/chapters",
+            )
 
-        return self.session.post(self.api_link, json=json_data).json()
+        json_response = self.session.post(self.api_link, json=json_data)
+        if json_response.ok:
+            json_data = json_response.json()["data"]
+
+            return MainPageResponse(
+                mangas=[
+                    reformat_json_to_manga_object(node["node"])
+                    for node in json_data["mangas"]["edges"]
+                ],
+                last_manga_chapters=[
+                    reformat_json_to_manga_object(node["node"])
+                    for node in json_data["lastMangaChapters"]["edges"]
+                ],
+                manga_popular_by_period=[
+                    reformat_json_to_manga_object(node)
+                    for node in json_data["mangaPopularByPeriod"]
+                ],
+            )
+        else:
+            return None
 
 
 class NewMangaApi:
