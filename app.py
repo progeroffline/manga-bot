@@ -29,20 +29,12 @@ dp = Dispatcher()
 async def command_get_manga_handler(message: Message) -> None:
     manga_api = SenkuroApi()
     mangas_main_page = manga_api.get_main_page()
-    manga = random.choice(
-        mangas_main_page["data"]["lastMangaChapters"]["edges"])
-    manga = manga["node"]
-
-    title = None
-
-    for diff_title in manga["titles"]:
-        if diff_title["lang"] == "RU":
-            title = diff_title["content"]
-    picture_url = manga["cover"]["original"]["url"]
-    page_url = f"https://senkuro.com/manga/{manga['slug']}/chapters"
-
+    if mangas_main_page is None:
+        return None
+    
+    manga = random.choice(mangas_main_page.last_manga_chapters)
     await message.answer_photo(
-        photo=picture_url, caption=f"👉 <a href='{page_url}'>{title}</a>"
+        photo=manga.picture_url, caption=f"👉 <a href='{manga.page_url}'>{manga.title_ru}</a>"
     )
 
 
