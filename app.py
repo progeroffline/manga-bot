@@ -31,10 +31,11 @@ async def command_get_manga_handler(message: Message) -> None:
     mangas_main_page = manga_api.get_main_page()
     if mangas_main_page is None:
         return None
-    
+
     manga = random.choice(mangas_main_page.last_manga_chapters)
     await message.answer_photo(
-        photo=manga.picture_url, caption=f"👉 <a href='{manga.page_url}'>{manga.title_ru}</a>"
+        photo=manga.picture_url, caption=f"👉 <a href='{
+            manga.page_url}'>{manga.title_ru}</a>"
     )
 
 
@@ -46,12 +47,11 @@ async def command_get_new_manga_handler(message: Message) -> None:
         mangas_main_page["items"]
     )
     manga_title = manga["title"]["ru"]
-    picture_url = f"https://img.newmanga.org/ProjectLarge/webp/{
-        manga['image']['name']}"
-    page_url = f"https://newmanga.org/p/{manga['slug']}"
 
+    manga = random.choice(mangas_main_page.mangas)
     await message.answer_photo(
-        photo=picture_url, caption=f"👉 <a href='{page_url}'>{manga_title}</a>"
+        photo=manga.picture_url, caption=f"👉 <a href='{
+            manga.page_url}'>{manga.title_ru}</a>"
     )
 
 

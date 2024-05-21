@@ -20,6 +20,21 @@ class Manga:
 
 
 @dataclass()
+class NewManga:
+    id: str
+    slug: str
+    description: str
+    type: str
+    raiting: str
+
+    title_ru: str
+    title_en: Optional[str]
+
+    picture_url: str
+    page_url: str
+
+
+@dataclass()
 class MainPageResponse:
     mangas: List[Manga]
     last_manga_chapters: List[Manga]
@@ -63,7 +78,8 @@ class SenkuroApi:
         }
 
         def reformat_json_to_manga_object(json_data: Dict[str, Any]) -> Manga:
-            titles = {title["lang"]: title["content"] for title in json_data["titles"]}
+            titles = {title["lang"]: title["content"]
+                      for title in json_data["titles"]}
             return Manga(
                 id=json_data["id"],
                 slug=json_data["slug"],
@@ -74,7 +90,8 @@ class SenkuroApi:
                 title_en=titles.get("EN"),
                 title_ja=titles.get("JA"),
                 picture_url=json_data["cover"]["original"]["url"],
-                page_url=f"https://senkuro.com/manga/{json_data['slug']}/chapters",
+                page_url=f"https://senkuro.com/manga/{
+                    json_data['slug']}/chapters",
             )
 
         json_response = self.session.post(self.api_link, json=json_data)
@@ -119,7 +136,22 @@ class NewMangaApi:
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
         }
 
-    def get_main_page(self):
-        params = {"size": "30"}
 
-        return self.session.get(self.api_link, params=params).json()
+def get_main_page(self):
+    params = {"size": "30"}
+
+    def reformat_json_to_manga_object(params: Dict[str, Any]) -> NewManga:
+        titles = {title["title"]
+                  for title in params["items"]}
+        return NewManga(
+            id=params["id"],
+            slug=params["slug"],
+            description=params["description"],
+            type=params["type"],
+            raiting=params["rating"],
+            title_ru=titles("ru"),
+            title_en=titles.get("en"),
+            picture_url=f"https://img.newmanga.org/ProjectLarge/webp/{
+                params['image']['name']}",
+            page_url=f"https://newmanga.org/p/{params['slug']}",
+        )
