@@ -137,21 +137,24 @@ class NewMangaApi:
         }
 
 
-def get_main_page(self):
-    params = {"size": "30"}
+# def get_main_page(self):
+#     params = {"size": "30"}
 
-    def reformat_json_to_manga_object(params: Dict[str, Any]) -> NewManga:
-        titles = {title["title"]
-                  for title in params["items"]}
-        return NewManga(
-            id=params["id"],
-            slug=params["slug"],
-            description=params["description"],
-            type=params["type"],
-            raiting=params["rating"],
-            title_ru=titles("ru"),
-            title_en=titles.get("en"),
-            picture_url=f"https://img.newmanga.org/ProjectLarge/webp/{
-                params['image']['name']}",
-            page_url=f"https://newmanga.org/p/{params['slug']}",
-        )
+#     def reformat_json_to_manga_object(params: Dict[str, Any]) -> NewManga:
+#         titles = {title["title"]
+#                   for title in params["items"]}
+#         return NewManga(
+#             id=params["id"],
+#             slug=params["slug"],
+#             description=params["description"],
+#             type=params["type"],
+#             raiting=params["rating"],
+#             title_ru=titles("ru"),
+#             title_en=titles.get("en"),
+#             picture_url=f"https://img.newmanga.org/ProjectLarge/webp/{
+#                 params['image']['name']}",
+#             page_url=f"https://newmanga.org/p/{params['slug']}",
+#         )
+
+
+# Я закомментил то, что добавил или переделал. Немного просел. Не понимаю, что делать с этим и как взаимодействовать с MainPageResponse. И еще я не знаю, как оставлять комменты
