@@ -51,7 +51,7 @@ async def command_get_new_manga_handler(message: Message) -> None:
     )
 
 
-@ dp.message(CommandStart())
+@dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     """
     This handler receives messages with `/start` command
@@ -73,7 +73,7 @@ async def command_start_handler(message: Message) -> None:
         await bot.send_message(chat_id=ADMIN_ID, text=f"@{message.from_user.username}")
 
 
-@ dp.message()
+@dp.message()
 async def echo_handler(message: Message) -> None:
     """
     Handler will forward receive a message back to the sender

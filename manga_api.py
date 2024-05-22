@@ -27,6 +27,7 @@ class NewManga:
     type: str
     raiting: float
     likes: int
+
     title_ru: str
     title_en: Optional[str]
 
@@ -169,6 +170,5 @@ class NewMangaApi:
                     for item in params["items"]
                 ],
             )
-
         else:
             return None
