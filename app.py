@@ -7,9 +7,8 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 
-from manga_api import SenkuroApi
+from manga_api import SenkuroApi, NewMangaApi
 from environs import Env
-
 env = Env()
 env.read_env()
 
@@ -23,20 +22,32 @@ bot = Bot(
     ),
 )
 
-manga_api = SenkuroApi()
 dp = Dispatcher()
 
 
 @dp.message(Command("getmanga"))
 async def command_get_manga_handler(message: Message) -> None:
+    manga_api = SenkuroApi()
     mangas_main_page = manga_api.get_main_page()
     if mangas_main_page is None:
         return None
 
     manga = random.choice(mangas_main_page.last_manga_chapters)
     await message.answer_photo(
-        photo=manga.picture_url,
-        caption=f"👉 <a href='{manga.picture_url}'>{manga.title_ru}</a>",
+        photo=manga.picture_url, caption=f"👉 <a href='{
+            manga.page_url}'>{manga.title_ru}</a>"
+    )
+
+
+@dp.message(Command("getnewmanga"))
+async def command_get_new_manga_handler(message: Message) -> None:
+    manga_api = NewMangaApi()
+    mangas_main_page = manga_api.get_main_page()
+
+    manga = random.choice(mangas_main_page.items)
+    await message.answer_photo(
+        photo=manga.picture_url, caption=f"👉 <a href='{
+            manga.page_url}'>{manga.title_ru}</a>"
     )
 
 
