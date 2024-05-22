@@ -116,6 +116,11 @@ class SenkuroApi:
             return None
 
 
+@dataclass()
+class NewMangaMainPageResonse:
+    items: List[NewManga]
+
+
 class NewMangaApi:
 
     def __init__(self):
@@ -136,22 +141,34 @@ class NewMangaApi:
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
         }
 
+    def get_main_page(self) -> Union[NewMangaMainPageResonse, None]:
+        params = {"size": "30"}
 
-def get_main_page(self):
-    params = {"size": "30"}
+        def reformat_json_to_manga_object(params: Dict[str, Any]) -> NewManga:
+            titles = {title["title"]
+                      for title in params["items"]}
+            return NewManga(
+                id=params["id"],
+                slug=params["slug"],
+                description=params["description"],
+                type=params["type"],
+                raiting=params["rating"],
+                title_ru=titles("ru"),
+                title_en=titles.get("en"),
+                picture_url=f"https://img.newmanga.org/ProjectLarge/webp/{
+                    params['image']['name']}",
+                page_url=f"https://newmanga.org/p/{params['slug']}",
+            )
 
-    def reformat_json_to_manga_object(params: Dict[str, Any]) -> NewManga:
-        titles = {title["title"]
-                  for title in params["items"]}
-        return NewManga(
-            id=params["id"],
-            slug=params["slug"],
-            description=params["description"],
-            type=params["type"],
-            raiting=params["rating"],
-            title_ru=titles("ru"),
-            title_en=titles.get("en"),
-            picture_url=f"https://img.newmanga.org/ProjectLarge/webp/{
-                params['image']['name']}",
-            page_url=f"https://newmanga.org/p/{params['slug']}",
-        )
+        json_response = self.session.post(self.api_link, json=params)
+        if json_response.ok:
+            params = json_response.json()["items"]
+
+            return NewMangaMainPageResonse(
+                items=[
+                    reformat_json_to_manga_object(items["items"])
+                    for items in params["items"]
+                ]
+            )
+        else:
+            return None

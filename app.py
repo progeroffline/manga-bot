@@ -48,7 +48,7 @@ async def command_get_new_manga_handler(message: Message) -> None:
     )
     manga_title = manga["title"]["ru"]
 
-    manga = random.choice(mangas_main_page.mangas)
+    manga = random.choice(mangas_main_page.items)
     await message.answer_photo(
         photo=manga.picture_url, caption=f"👉 <a href='{
             manga.page_url}'>{manga.title_ru}</a>"
