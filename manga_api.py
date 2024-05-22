@@ -152,8 +152,8 @@ class NewMangaApi:
                 type=params["type"],
                 raiting=params["rating"],
                 likes=params["hearts"],
-                title_ru=params["items"]["ru"],
-                title_en=params["items"]["en"],
+                title_ru=params["title"]["ru"],
+                title_en=params["title"]["en"],
                 picture_url=f"https://img.newmanga.org/ProjectLarge/webp/{
                     params['image']['name']}",
                 page_url=f"https://newmanga.org/p/{params['slug']}",
