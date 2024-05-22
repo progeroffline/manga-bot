@@ -144,6 +144,9 @@ class NewMangaApi:
     def get_main_page(self) -> Union[NewMangaMainPageResonse, None]:
         params = {"size": "30"}
 
+# def get_main_page(self):
+#     params = {"size": "30"}
+
         def reformat_json_to_manga_object(params: Dict[str, Any]) -> NewManga:
             titles = {title["title"]
                       for title in params["items"]}
