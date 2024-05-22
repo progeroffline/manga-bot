@@ -159,7 +159,7 @@ class NewMangaApi:
                 page_url=f"https://newmanga.org/p/{params['slug']}",
             )
 
-        json_response = self.session.post(self.api_link, json=params)
+        json_response = self.session.get(self.api_link, json=params)
         if json_response.ok:
             params = json_response.json()
 
