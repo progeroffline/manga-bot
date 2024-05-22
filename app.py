@@ -43,10 +43,6 @@ async def command_get_manga_handler(message: Message) -> None:
 async def command_get_new_manga_handler(message: Message) -> None:
     manga_api = NewMangaApi()
     mangas_main_page = manga_api.get_main_page()
-    manga = random.choice(
-        mangas_main_page["items"]
-    )
-    manga_title = manga["title"]["ru"]
 
     manga = random.choice(mangas_main_page.items)
     await message.answer_photo(
