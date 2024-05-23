@@ -21,12 +21,11 @@ class Manga:
 
 @dataclass()
 class NewManga:
-    id: int
+    id: str
     slug: str
     description: str
     type: str
-    raiting: float
-    likes: int
+    raiting: str
 
     title_ru: str
     title_en: Optional[str]
@@ -40,11 +39,6 @@ class MainPageResponse:
     mangas: List[Manga]
     last_manga_chapters: List[Manga]
     manga_popular_by_period: List[Manga]
-
-
-@dataclass()
-class NewMangaMainPageResonse:
-    items: List[NewManga]
 
 
 class SenkuroApi:
@@ -122,6 +116,11 @@ class SenkuroApi:
             return None
 
 
+@dataclass()
+class NewMangaMainPageResonse:
+    items: List[NewManga]
+
+
 class NewMangaApi:
 
     def __init__(self):
@@ -146,29 +145,29 @@ class NewMangaApi:
         params = {"size": "30"}
 
         def reformat_json_to_manga_object(params: Dict[str, Any]) -> NewManga:
+            titles = {title["title"]
+                      for title in params["items"]}
             return NewManga(
                 id=params["id"],
                 slug=params["slug"],
                 description=params["description"],
                 type=params["type"],
                 raiting=params["rating"],
-                likes=params["hearts"],
-                title_ru=params["title"]["ru"],
-                title_en=params["title"]["en"],
-                picture_url=f"https://img.newmanga.org/ProjectLarge/webp/{
-                    params['image']['name']}",
+                title_ru=titles("ru"),
+                title_en=titles.get("en"),
+                picture_url=f"https://img.newmanga.org/ProjectLarge/webp/{params['image']['name']}",
                 page_url=f"https://newmanga.org/p/{params['slug']}",
             )
 
-        json_response = self.session.get(self.api_link, json=params)
+        json_response = self.session.post(self.api_link, json=params)
         if json_response.ok:
-            params = json_response.json()
+            params = json_response.json()["items"]
 
             return NewMangaMainPageResonse(
                 items=[
-                    reformat_json_to_manga_object(item)
-                    for item in params["items"]
-                ],
+                    reformat_json_to_manga_object(items["items"])
+                    for items in params["items"]
+                ]
             )
         else:
             return None
