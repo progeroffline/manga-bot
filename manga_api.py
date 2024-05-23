@@ -21,11 +21,12 @@ class Manga:
 
 @dataclass()
 class NewManga:
-    id: str
+    id: int
     slug: str
     description: str
     type: str
-    raiting: str
+    raiting: float
+    likes: int
 
     title_ru: str
     title_en: Optional[str]
@@ -39,6 +40,11 @@ class MainPageResponse:
     mangas: List[Manga]
     last_manga_chapters: List[Manga]
     manga_popular_by_period: List[Manga]
+
+
+@dataclass()
+class NewMangaMainPageResonse:
+    items: List[NewManga]
 
 
 class SenkuroApi:
@@ -90,8 +96,7 @@ class SenkuroApi:
                 title_en=titles.get("EN"),
                 title_ja=titles.get("JA"),
                 picture_url=json_data["cover"]["original"]["url"],
-                page_url=f"https://senkuro.com/manga/{
-                    json_data['slug']}/chapters",
+                page_url=f"https://senkuro.com/manga/{json_data['slug']}/chapters",
             )
 
         json_response = self.session.post(self.api_link, json=json_data)
@@ -114,11 +119,6 @@ class SenkuroApi:
             )
         else:
             return None
-
-
-@dataclass()
-class NewMangaMainPageResonse:
-    items: List[NewManga]
 
 
 class NewMangaApi:
@@ -145,29 +145,28 @@ class NewMangaApi:
         params = {"size": "30"}
 
         def reformat_json_to_manga_object(params: Dict[str, Any]) -> NewManga:
-            titles = {title["title"]
-                      for title in params["items"]}
             return NewManga(
                 id=params["id"],
                 slug=params["slug"],
                 description=params["description"],
                 type=params["type"],
                 raiting=params["rating"],
-                title_ru=titles("ru"),
-                title_en=titles.get("en"),
+                likes=params["hearts"],
+                title_ru=params["title"]["ru"],
+                title_en=params["title"]["en"],
                 picture_url=f"https://img.newmanga.org/ProjectLarge/webp/{params['image']['name']}",
                 page_url=f"https://newmanga.org/p/{params['slug']}",
             )
 
-        json_response = self.session.post(self.api_link, json=params)
+        json_response = self.session.get(self.api_link, json=params)
         if json_response.ok:
-            params = json_response.json()["items"]
+            params = json_response.json()
 
             return NewMangaMainPageResonse(
                 items=[
-                    reformat_json_to_manga_object(items["items"])
-                    for items in params["items"]
-                ]
+                    reformat_json_to_manga_object(item)
+                    for item in params["items"]
+                ],
             )
         else:
             return None
