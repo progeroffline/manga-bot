@@ -43,20 +43,14 @@ async def command_get_manga_handler(message: Message) -> None:
 async def command_get_new_manga_handler(message: Message) -> None:
     manga_api = NewMangaApi()
     mangas_main_page = manga_api.get_main_page()
-    manga = random.choice(
-        mangas_main_page["items"]
-    )
-    manga_title = manga["title"]["ru"]
-    picture_url = f"https://img.newmanga.org/ProjectLarge/webp/{
-        manga['image']['name']}"
-    page_url = f"https://newmanga.org/p/{manga['slug']}"
 
+    manga = random.choice(mangas_main_page.items)
     await message.answer_photo(
-        photo=picture_url, caption=f"👉 <a href='{page_url}'>{manga_title}</a>"
+        photo=manga.picture_url, caption=f"👉 <a href='{manga.page_url}'>{manga.title_ru}</a>"
     )
 
 
-@ dp.message(CommandStart())
+@dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     """
     This handler receives messages with `/start` command
@@ -78,7 +72,7 @@ async def command_start_handler(message: Message) -> None:
         await bot.send_message(chat_id=ADMIN_ID, text=f"@{message.from_user.username}")
 
 
-@ dp.message()
+@dp.message()
 async def echo_handler(message: Message) -> None:
     """
     Handler will forward receive a message back to the sender
