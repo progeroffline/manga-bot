@@ -119,7 +119,10 @@ class NewMangaApi:
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
         }
 
-    def get_main_page(self):
+    def get_main_page(self) -> None:
         params = {"size": "30"}
+        json_response = self.session.get(self.api_link, params=params).json()
 
-        return self.session.get(self.api_link, params=params).json()
+        if json_response.ok:
+        else:
+            return None
