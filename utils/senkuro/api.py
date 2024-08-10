@@ -1,4 +1,4 @@
-import requests
+import httpx
 from typing import Any
 from .types import MainPageResponse, Manga
 
@@ -6,11 +6,12 @@ from .types import MainPageResponse, Manga
 class SenkuroApi:
     def __init__(self):
         self.api_link = "https://api.senkuro.com/graphql"
-        self.session = requests.Session()
-        self.session.headers = {
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
-            "Content-Type": "application/json",
-        }
+        self.client = httpx.Client(
+            headers={
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
+                "Content-Type": "application/json",
+            }
+        )
 
     @staticmethod
     def reformat_json_to_manga_object(json_data: dict[str, Any]) -> Manga:
@@ -46,8 +47,8 @@ class SenkuroApi:
             },
         }
 
-        json_response = self.session.post(self.api_link, json=json_data)
-        if json_response.ok:
+        json_response = self.client.post(self.api_link, json=json_data)
+        if json_response.status_code == 200:
             json_data = json_response.json()["data"]
 
             return MainPageResponse(
@@ -132,11 +133,11 @@ class SenkuroApi:
         if page > 0:
             for _ in range(page):
                 json_data["variables"]["after"] = cursor
-                json_response = self.session.post(self.api_link, json=json_data)
+                json_response = self.client.post(self.api_link, json=json_data)
                 cursor = json_response.json()["data"]["mangas"]["pageInfo"]["endCursor"]
 
         if json_response is None:
-            json_data = json_response = self.session.post(
+            json_data = json_response = self.client.post(
                 self.api_link, json=json_data
             ).json()
         else:
