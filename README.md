@@ -1,2 +1,2 @@
-# manga-bot
-Bot for reading, searching, and downloading magnesium from the site.
+# MangaBot
+Bot use senkuro not official api to get mangas data
