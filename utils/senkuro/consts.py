@@ -6,4 +6,4 @@ headers = {
 
 # Urls section
 api_graphql = "https://api.senkuro.com/graphql"
-home = "https://senkuro.com/manga/{slug}/chapters"
+home = "https://senkuro.com/manga/{slug}/"

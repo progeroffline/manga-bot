@@ -10,8 +10,8 @@ class NewMangaApi:
         self.api_link = "https://api.newmanga.org/v2/projects/popular"
         self.client = httpx.Client(
             headers={
-                "accept": "application/json, text/plain, */*",
-                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+                "Accept": "application/json, text/plain, */*",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
             }
         )
 

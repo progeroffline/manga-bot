@@ -8,18 +8,34 @@ class Manga:
     slug: str
     status: str
     type: str
-    raiting: str
+    raiting: str | None
 
     title_ru: str
     title_en: Optional[str]
     title_ja: Optional[str]
 
-    picture_url: str
+    picture_url: str | None
     page_url: str
 
 
 @dataclass()
-class MainPageResponse:
+class HomeResponse:
     mangas: List[Manga]
     last_manga_chapters: List[Manga]
     manga_popular_by_period: List[Manga]
+
+
+@dataclass()
+class CatalogResponse:
+    mangas: List[Manga]
+    cursor: str | None
+
+
+@dataclass()
+class SearchResponse:
+    mangas: List[Manga]
+
+
+@dataclass()
+class MangaResponse:
+    manga: Manga
